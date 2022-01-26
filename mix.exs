@@ -22,7 +22,8 @@ defmodule NxLinearRegression.MixProject do
   defp deps do
     [
       {:exla, "~> 0.1.0-dev", github: "elixir-nx/nx", sparse: "exla"},
-      {:nx, "~> 0.1.0-dev", github: "elixir-nx/nx", sparse: "nx", override: true}
+      {:nx, "~> 0.1.0-dev", github: "elixir-nx/nx", sparse: "nx", override: true},
+      {:nimble_csv, "~> 1.1"}
     ]
   end
 end
