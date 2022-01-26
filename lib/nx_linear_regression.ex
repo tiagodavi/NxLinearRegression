@@ -31,6 +31,23 @@ defmodule NxLinearRegression do
     {w, b}
   end
 
+  defn normalize(data) do
+    total = elem(data.shape, 0)
+
+    mean = Nx.mean(data)
+
+    std =
+      (data - mean)
+      |> Nx.power(2)
+      |> Nx.sum()
+      |> Nx.divide(total)
+      |> Nx.sqrt()
+
+    data
+    |> Nx.subtract(mean)
+    |> Nx.divide(std)
+  end
+
   @spec train(data :: tuple(), lr :: float(), epochs :: integer()) ::
           {Nx.Tensor.t(), Nx.Tensor.t()}
   def train(data, lr, epochs) do
@@ -40,10 +57,17 @@ defmodule NxLinearRegression do
       acc ->
         {x, y} = Enum.unzip(data)
 
-        x = Nx.tensor(x)
-        y = Nx.tensor(y)
+        x = Nx.tensor(x) |> normalize()
+        y = Nx.tensor(y) |> normalize()
 
         update(acc, x, y, lr)
     end
+  end
+
+  @spec train_test_split(data :: list(), train_size :: float()) :: tuple()
+  def train_test_split(data, train_size) do
+    num_examples = Enum.count(data)
+    num_train = floor(train_size * num_examples)
+    Enum.split(data, num_train)
   end
 end

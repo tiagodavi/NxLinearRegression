@@ -1,26 +1,40 @@
 defmodule NxLinearRegression.FuelEconomy do
   @moduledoc """
-  Predict Fuel Economy with Linear Regression
+  Try to predict the likely fuel consumption efficiency
   https://www.kaggle.com/vinicius150987/regression-fuel-consumption
   """
   alias NimbleCSV.RFC4180, as: CSV
 
-  @epochs 100
+  @epochs 500
   @learning_rate 0.01
 
-  def train do
-    data = load_data()
-
-    {train, test} = train_test_split(data, 0.8)
-
-    params = NxLinearRegression.train(train, @learning_rate, @epochs)
-
-    # IO.inspect NxLinearRegression.loss(params, x_test, y_test)
-
-    # params
+  @spec train(data :: tuple) :: {Nx.Tensor.t(), Nx.Tensor.t()}
+  def train(data) do
+    NxLinearRegression.train(data, @learning_rate, @epochs)
   end
 
-  defp load_data do
+  @spec predict(params :: tuple(), data :: list()) :: Nx.Tensor.t()
+  def predict(params, data) do
+    x =
+      data
+      |> Nx.tensor()
+      |> NxLinearRegression.normalize()
+
+    NxLinearRegression.predict(params, x)
+  end
+
+  @spec mse(params :: tuple(), data :: tuple()) :: Nx.Tensor.t()
+  def mse(params, data) do
+    {x, y} = Enum.unzip(data)
+
+    x = Nx.tensor(x) |> NxLinearRegression.normalize()
+    y = Nx.tensor(y) |> NxLinearRegression.normalize()
+
+    NxLinearRegression.loss(params, x, y)
+  end
+
+  @spec load_data :: Stream.t()
+  def load_data do
     "FuelEconomy.csv"
     |> File.stream!()
     |> CSV.parse_stream()
@@ -30,11 +44,5 @@ defmodule NxLinearRegression.FuelEconomy do
         Float.parse(fuel_economy) |> elem(0)
       }
     end)
-  end
-
-  defp train_test_split(data, size) do
-    num_examples = Enum.count(data)
-    num_train = floor(size * num_examples)
-    Enum.split(data, num_train)
   end
 end
