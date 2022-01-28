@@ -31,13 +31,18 @@ defmodule NxLinearRegression do
     {w, b}
   end
 
-  defn normalize(data) do
-    total = elem(data.shape, 0)
+  @spec normalize(Nx.Tensor.t()) :: Nx.Tensor.t()
+  def normalize(%Nx.Tensor{shape: shape} = data) do
+    total =
+      shape
+      |> Tuple.to_list()
+      |> Enum.reduce(fn val, acc -> acc * val end)
 
     mean = Nx.mean(data)
 
     std =
-      (data - mean)
+      data
+      |> Nx.subtract(mean)
       |> Nx.power(2)
       |> Nx.sum()
       |> Nx.divide(total)
@@ -47,6 +52,8 @@ defmodule NxLinearRegression do
     |> Nx.subtract(mean)
     |> Nx.divide(std)
   end
+
+  def normalize(value), do: raise("#{inspect(value)} is not a tensor")
 
   @spec train(data :: tuple(), lr :: float(), epochs :: integer()) ::
           {Nx.Tensor.t(), Nx.Tensor.t()}
