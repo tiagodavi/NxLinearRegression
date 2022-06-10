@@ -21,9 +21,9 @@ defmodule NxLinearRegression.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:exla, "~> 0.1.0-dev", github: "elixir-nx/nx", sparse: "exla"},
-      {:nx, "~> 0.1.0-dev", github: "elixir-nx/nx", sparse: "nx", override: true},
-      {:nimble_csv, "~> 1.1"}
+      {:nx, "~> 0.2.1"},
+      {:nimble_csv, "~> 1.1"},
+      {:scholar, "~> 0.1.0", github: "elixir-nx/scholar"}
     ]
   end
 end
